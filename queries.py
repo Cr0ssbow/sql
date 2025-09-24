@@ -125,7 +125,7 @@ def f4():
 
     curs.execute('''
                  SELECT 
-                 COUNT(*)
+                 COUNT(*) AS "Кол-во студентов"
                  FROM student s
                  JOIN "group" g ON s.group_id = g.id
                  JOIN department d ON g.department_id = d.id
@@ -158,7 +158,35 @@ def f5():
     Атрибуты вывода: 'Юр. фак-т. Средний возраст'. Количество строк: 1.
 
     """
-    raise NotImplementedError()
+    print("\n")
+    con = sqlite3.connect("ursei.db")
+    curs = con.cursor()
+
+    curs.execute('''
+                 SELECT ROUND(AVG(s.age)) AS "Юрфак. Средний возраст"
+                 FROM student s
+                 JOIN "group" g ON s.group_id = g.id
+                 JOIN department d ON g.department_id = d.id
+                 WHERE d.name = 'Юриспруденция';
+                 ''')
+    
+    #получим имена столбцов из свойства description курсора
+    col_names = [cn[0] for cn in curs.description]
+    #получим данные
+    rows = curs.fetchall()
+
+    #Инициализируем таблицу c заголовками
+    pt = PrettyTable(col_names)
+    pt.align[col_names[0]] = "l" # Выравнивание столбца по левому краю
+
+    #Добавим данные в таблицу
+    for row in rows:
+        pt.add_row(row)
+    
+    #Выводим таблицу
+    print(pt)
+    con.close()
+    
 
 def f6():
     """Выведите студентов количество, обучающихся на каждом факультете.
@@ -166,7 +194,35 @@ def f6():
     равно количеству факультетов.
 
         """
-    raise NotImplementedError()
+    print("\n")
+    con = sqlite3.connect("ursei.db")
+    curs = con.cursor()
+
+    curs.execute('''
+                 SELECT d.name AS "Факультет",
+                 COUNT(s.id) AS "Количество"
+                 FROM department d
+                 LEFT JOIN "group" g ON d.id = g.department_id
+                 LEFT JOIN student s ON g.id = s.group_id
+                 GROUP BY d.name;
+                 ''')
+    
+    #получим имена столбцов из свойства description курсора
+    col_names = [cn[0] for cn in curs.description]
+    #получим данные
+    rows = curs.fetchall()
+
+    #Инициализируем таблицу c заголовками
+    pt = PrettyTable(col_names)
+    pt.align[col_names[0]] = "l" # Выравнивание столбца по левому краю
+
+    #Добавим данные в таблицу
+    for row in rows:
+        pt.add_row(row)
+    
+    #Выводим таблицу
+    print(pt)
+    con.close()
 
 
 def f7():
@@ -175,7 +231,35 @@ def f7():
     Атрибуты вывода: 'Факультет', 'Средний возраст'.
 
     """
-    raise NotImplementedError()
+    print("\n")
+    con = sqlite3.connect("ursei.db")
+    curs = con.cursor()
+
+    curs.execute('''
+                 SELECT d.name AS "Факультет",
+                 ROUND(AVG(s.age), 2) AS "Средний возраст"
+                 FROM department d
+                 JOIN "group" g ON d.id = g.department_id
+                 JOIN student s ON g.id = s.group_id
+                 GROUP BY d.name;
+                 ''')
+    
+    #получим имена столбцов из свойства description курсора
+    col_names = [cn[0] for cn in curs.description]
+    #получим данные
+    rows = curs.fetchall()
+
+    #Инициализируем таблицу c заголовками
+    pt = PrettyTable(col_names)
+    pt.align[col_names[0]] = "l" # Выравнивание столбца по левому краю
+
+    #Добавим данные в таблицу
+    for row in rows:
+        pt.add_row(row)
+    
+    #Выводим таблицу
+    print(pt)
+    con.close()
 
 def f8():
     """Выведите список студентов, которые не обучаются на юридическом факультете.
